@@ -45,7 +45,7 @@ jobs:
         run: |
           PR_EXISTS=$(gh pr list --head develop --base main --state open --json number --jq 'length')
           if [ "$PR_EXISTS" -eq "0" ]; then
-            gh pr create --base main --head develop --title "release: nova versão gerada na tag ${{ steps.tagger.outputs.new_tag }}" --body "Uma nova tag (${{ steps.tagger.outputs.new_tag }}) foi gerada com sucesso na develop. Revise este PR para aprovar o merge em produção (main)." --label "release"
+            gh pr create --base main --head develop --title "release: nova versão gerada na tag ${{ steps.tagger.outputs.new_tag }}" --body "Uma nova tag (${{ steps.tagger.outputs.new_tag }}) foi gerada com sucesso na develop. Revise este PR para aprovar o merge em produção (main)."
           else
             echo "Pull Request já existe. Nenhuma ação necessária."
           fi

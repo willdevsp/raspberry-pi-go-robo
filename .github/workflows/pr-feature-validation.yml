@@ -39,7 +39,7 @@ jobs:
         run: |
           PR_EXISTS=$(gh pr list --head ${{ github.ref_name }} --base develop --state open --json number --jq 'length')
           if [ "$PR_EXISTS" -eq "0" ]; then
-            gh pr create --base develop --head ${{ github.ref_name }} --title "feat: PR automático de ${{ github.ref_name }}" --body "PR gerado automaticamente após validação de testes na branch de feature." --label "automated pr"
+            gh pr create --base develop --head ${{ github.ref_name }} --title "feat: PR automático de ${{ github.ref_name }}" --body "PR gerado automaticamente após validação de testes na branch de feature."
           else
             echo "Pull Request já existe. Nenhuma ação necessária."
           fi
