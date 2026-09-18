@@ -38,56 +38,42 @@ git checkout -b feature/nome-da-feature
 ```
 
 
-2. **Abertura de PR:** O desenvolvedor abre um Pull Request apontando para a branch `develop`.
-3. **Pipeline de Validação (`pr-feature-validation.yml`):**
-* **Disparo:** Eventos `pull_request` (abertura e sincronização) contra a branch `develop`.
+2. **Push e Pipeline de Validação (`pr-feature-validation.yml`):**
+* Ao concluir as edições, o desenvolvedor faz um `push` direto para sua branch `feature/*`.
+* **Disparo:** Evento `push` contra branches `feature/*`.
 * **Etapas executadas pelo runner:**
 * Validação de padronização de código (**Linter**).
 * Execução da suíte de **testes unitários** e cobertura de código.
-
-
-* **Auto-Merge:** Configurado via `gh pr merge --auto --squash` (ou action equivalente). Assim que os status checks forem aprovados e as regras de proteção forem atendidas, o GitHub Actions realiza o merge automático na `develop`.
+3. **Criação de PR Automática:**
+* Se a esteira passar com sucesso, uma action (`peter-evans/create-pull-request`) abre um PR apontando automaticamente para a branch `develop`.
+* **Aprovação Manual (Code Review):** O PR permanece aberto aguardando a avaliação e aprovação manual do desenvolvedor responsável antes de ser mesclado na `develop`.
 
 
 
 ---
 
-### Fase 2: Reteste em `develop` e Abertura Automática de PR para `main`
+### Fase 2: Reteste, Geração da Tag e Abertura Automática de PR para `main`
 
 1. **Pipeline de Integração (`develop-integration.yml`):**
 * **Disparo:** Evento `push` na branch `develop` (acionado logo após o merge da feature).
 * **Etapas executadas pelo runner:**
 * Execução completa dos testes no contexto integrado da `develop` (testes unitários, de integração e validação de build).
-
-
-
-
-2. **Criação Automática do PR:**
-* Caso todos os testes passem com sucesso, a Action utiliza a GitHub CLI (`gh pr create`) ou a action `peter-evans/create-pull-request` para verificar se já existe um PR aberto de `develop` para `main`.
-* Se não existir, a esteira abre automaticamente o Pull Request de `develop` com destino à `main`.
-
-
+2. **Geração da Release Tag:**
+* Com os testes aprovados na `develop`, o workflow calcula a próxima versão semântica (SemVer) e cria a tag (ex: `v1.3.0`) ainda na branch `develop`.
+3. **Criação Automática do PR:**
+* A Action utiliza a action `peter-evans/create-pull-request` para criar um Pull Request de `develop` com destino à `main`, incluindo a nova tag gerada no título, aguardando aprovação manual.
 
 ---
 
-### Fase 3: Validação Final, Tag de Release e Merge em `main`
+### Fase 3: Validação Final e Merge em `main`
 
 1. **Pipeline de Release (`release-pipeline.yml`):**
 * **Disparo:** Eventos `pull_request` contra a branch `main`.
 * **Etapas executadas pelo runner:**
 * Execução da suíte de testes finais (regressão/smoke tests).
-
-
-
-
-2. **Geração da Release Tag:**
-* Com os testes 100% aprovados e antes da conclusão do merge, o workflow calcula a próxima versão semântica (SemVer) com base no histórico de commits.
-* A Action gera e publica a tag no repositório (ex: `v1.3.0`) apontando para o commit validado.
-
-
-3. **Merge para Produção:**
-* O PR é mesclado na `main` (usando estratégia de *Merge Commit* para preservar histórico de releases).
-* O deploy de produção é disparado a partir da criação da tag ou do merge na `main`.
+2. **Merge para Produção:**
+* O PR é avaliado manualmente e mesclado na `main`.
+* O deploy de produção é disparado a partir do merge na `main`.
 
 
 
@@ -110,7 +96,6 @@ permissions:
 
 
 2. **Configurações de Repositório (`Settings` > `General`):**
-* Habilitar a opção **Allow auto-merge**.
 * Habilitar **Automatically delete head branches** (para limpar as branches de feature após o merge).
 
 
