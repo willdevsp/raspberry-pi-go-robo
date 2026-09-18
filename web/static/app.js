@@ -41,20 +41,18 @@ function connect() {
     };
 }
 
-document.addEventListener('keydown', (e) => {
+function handleKeyDown(key) {
     if (!ws || ws.readyState !== WebSocket.OPEN) return;
     
-    const key = e.key.toUpperCase();
     if (['W', 'A', 'S', 'D', 'Q', 'E'].includes(key)) {
         if (currentKey !== key) {
             currentKey = key;
             startLoop(key);
         }
     }
-});
+}
 
-document.addEventListener('keyup', (e) => {
-    const key = e.key.toUpperCase();
+function handleKeyUp(key) {
     if (key === currentKey) {
         currentKey = null;
         stopLoop();
@@ -62,6 +60,34 @@ document.addEventListener('keyup', (e) => {
             ws.send('X');
         }
     }
+}
+
+document.addEventListener('keydown', (e) => handleKeyDown(e.key.toUpperCase()));
+document.addEventListener('keyup', (e) => handleKeyUp(e.key.toUpperCase()));
+
+// Virtual D-pad logic
+const dpadBtns = document.querySelectorAll('.dpad-btn');
+dpadBtns.forEach(btn => {
+    const key = btn.getAttribute('data-key');
+    
+    // Touch events for mobile
+    btn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        handleKeyDown(key);
+    });
+    btn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        handleKeyUp(key);
+    });
+    btn.addEventListener('touchcancel', (e) => {
+        e.preventDefault();
+        handleKeyUp(key);
+    });
+    
+    // Mouse events for desktop
+    btn.addEventListener('mousedown', () => handleKeyDown(key));
+    btn.addEventListener('mouseup', () => handleKeyUp(key));
+    btn.addEventListener('mouseleave', () => handleKeyUp(key));
 });
 
 function startLoop(key) {
