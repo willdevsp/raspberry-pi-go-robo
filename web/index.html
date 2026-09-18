@@ -13,6 +13,8 @@
         .disconnected { color: #f44336; }
         input[type="text"] { padding: 5px; font-size: 16px; }
         button { padding: 6px 12px; font-size: 16px; cursor: pointer; }
+        .dpad-btn { height: 70px; border-radius: 8px; font-weight: bold; background: #555; color: white; border: none; touch-action: none; user-select: none; }
+        .dpad-btn:active { background: #777; }
     </style>
 </head>
 <body>
@@ -37,7 +39,19 @@
             <li>Q: Diagonal Frente-Esquerda</li>
             <li>E: Diagonal Frente-Direita</li>
         </ul>
-        <p><em>Mantenha a tecla pressionada para mover.</em></p>
+        <p><em>Mantenha a tecla (ou os botões virtuais) pressionada para mover.</em></p>
+        
+        <div id="virtual-dpad" style="display: grid; grid-template-columns: repeat(3, 70px); grid-gap: 10px; justify-content: center; margin-top: 20px;">
+            <button class="dpad-btn" data-key="Q">↖ Q</button>
+            <button class="dpad-btn" data-key="W">W ⬆</button>
+            <button class="dpad-btn" data-key="E">E ↗</button>
+            <button class="dpad-btn" data-key="A">A ⬅</button>
+            <div></div>
+            <button class="dpad-btn" data-key="D">D ➡</button>
+            <div></div>
+            <button class="dpad-btn" data-key="S">S ⬇</button>
+            <div></div>
+        </div>
     </div>
 
     <script src="/static/app.js"></script>
