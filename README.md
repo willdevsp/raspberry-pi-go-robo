@@ -26,15 +26,44 @@ sudo nmcli device wifi hotspot ifname wlan0 ssid RoverPi_Net password 43214321
 
 O seu notebook ou celular pode então se conectar a esta rede para controlar o RoverPi diretamente com baixa latência.
 
-## Execução
+## Execução Automática (Systemd)
 
-Inicie o servidor (geralmente via `systemd` ou terminal):
+Para que o carrinho ligue o servidor sozinho assim que você colocar a bateria no Raspberry Pi, vamos usar o `systemd`.
 
+1. Copie o arquivo de serviço para a pasta do sistema:
 ```bash
-./rover-server -port=8080 -serial=/dev/ttyUSB0
+sudo cp deploy/roverpi.service /etc/systemd/system/
 ```
 
-Se o serial não for encontrado, ele rodará em "dry run" para fins de teste da interface UI.
+2. Recarregue os serviços e ative a inicialização junto com o sistema:
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable roverpi.service
+```
+
+3. Inicie o serviço agora mesmo:
+```bash
+sudo systemctl start roverpi.service
+```
+
+### Como Atualizar o Código
+
+Sempre que você recompilar o projeto no seu PC e quiser jogar uma versão nova pro carrinho, siga este fluxo para **não dar conflito de porta ou erro de arquivo em uso**:
+
+1. **PARE** o serviço rodando no Raspberry Pi:
+```bash
+sudo systemctl stop roverpi.service
+```
+2. Mande o arquivo novo via SCP do seu PC:
+```bash
+scp rover-server robocarrinho@<ip_do_pi>:~/
+```
+3. **INICIE** o serviço novamente no Pi:
+```bash
+sudo systemctl start roverpi.service
+```
+
+*(Dica: Para ver os logs em tempo real e ver os botões que estão sendo apertados, use `sudo journalctl -u roverpi.service -f`)*
 
 ## Uso
 

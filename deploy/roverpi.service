@@ -1,0 +1,14 @@
+[Unit]
+Description=RoverPi Go Server
+After=network.target
+
+[Service]
+ExecStart=/home/robocarrinho/rover-server -port=8080 -serial=/dev/ttyUSB0
+WorkingDirectory=/home/robocarrinho
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User=robocarrinho
+
+[Install]
+WantedBy=multi-user.target
