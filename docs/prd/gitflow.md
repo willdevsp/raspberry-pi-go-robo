@@ -46,9 +46,7 @@ git checkout -b feature/nome-da-feature
 * Execução da suíte de **testes unitários** e cobertura de código.
 3. **Criação de PR Automática:**
 * Se a esteira passar com sucesso, uma action (`peter-evans/create-pull-request`) abre um PR apontando automaticamente para a branch `develop`.
-
-
-* **Auto-Merge:** Configurado via `gh pr merge --auto --squash` (ou action equivalente). Assim que os status checks forem aprovados e as regras de proteção forem atendidas, o GitHub Actions realiza o merge automático na `develop`.
+* **Aprovação Manual (Code Review):** O PR permanece aberto aguardando a avaliação e aprovação manual do desenvolvedor responsável antes de ser mesclado na `develop`.
 
 
 
@@ -98,7 +96,6 @@ permissions:
 
 
 2. **Configurações de Repositório (`Settings` > `General`):**
-* Habilitar a opção **Allow auto-merge**.
 * Habilitar **Automatically delete head branches** (para limpar as branches de feature após o merge).
 
 

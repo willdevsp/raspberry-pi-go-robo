@@ -34,10 +34,12 @@ jobs:
         run: go test -v -cover ./tests/unit/...
 
       - name: Create Pull Request to Develop
-        uses: peter-evans/create-pull-request@v6
-        with:
-          branch: ${{ github.ref_name }}
-          base: develop
-          title: 'feat: automerge PR from ${{ github.ref_name }}'
-          body: 'Auto-generated PR from feature branch after successful validation.'
-          labels: 'feature, automated pr'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_EXISTS=$(gh pr list --head ${{ github.ref_name }} --base develop --state open --json number --jq 'length')
+          if [ "$PR_EXISTS" -eq "0" ]; then
+            gh pr create --base develop --head ${{ github.ref_name }} --title "feat: PR automático de ${{ github.ref_name }}" --body "PR gerado automaticamente após validação de testes na branch de feature." --label "automated pr"
+          else
+            echo "Pull Request já existe. Nenhuma ação necessária."
+          fi
