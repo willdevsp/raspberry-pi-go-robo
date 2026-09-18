@@ -54,42 +54,28 @@ git checkout -b feature/nome-da-feature
 
 ---
 
-### Fase 2: Reteste em `develop` e Abertura Automática de PR para `main`
+### Fase 2: Reteste, Geração da Tag e Abertura Automática de PR para `main`
 
 1. **Pipeline de Integração (`develop-integration.yml`):**
 * **Disparo:** Evento `push` na branch `develop` (acionado logo após o merge da feature).
 * **Etapas executadas pelo runner:**
 * Execução completa dos testes no contexto integrado da `develop` (testes unitários, de integração e validação de build).
-
-
-
-
-2. **Criação Automática do PR:**
-* Caso todos os testes passem com sucesso, a Action utiliza a GitHub CLI (`gh pr create`) ou a action `peter-evans/create-pull-request` para verificar se já existe um PR aberto de `develop` para `main`.
-* Se não existir, a esteira abre automaticamente o Pull Request de `develop` com destino à `main`.
-
-
+2. **Geração da Release Tag:**
+* Com os testes aprovados na `develop`, o workflow calcula a próxima versão semântica (SemVer) e cria a tag (ex: `v1.3.0`) ainda na branch `develop`.
+3. **Criação Automática do PR:**
+* A Action utiliza a action `peter-evans/create-pull-request` para criar um Pull Request de `develop` com destino à `main`, incluindo a nova tag gerada no título, aguardando aprovação manual.
 
 ---
 
-### Fase 3: Validação Final, Tag de Release e Merge em `main`
+### Fase 3: Validação Final e Merge em `main`
 
 1. **Pipeline de Release (`release-pipeline.yml`):**
 * **Disparo:** Eventos `pull_request` contra a branch `main`.
 * **Etapas executadas pelo runner:**
 * Execução da suíte de testes finais (regressão/smoke tests).
-
-
-
-
-2. **Geração da Release Tag:**
-* Com os testes 100% aprovados e antes da conclusão do merge, o workflow calcula a próxima versão semântica (SemVer) com base no histórico de commits.
-* A Action gera e publica a tag no repositório (ex: `v1.3.0`) apontando para o commit validado.
-
-
-3. **Merge para Produção:**
-* O PR é mesclado na `main` (usando estratégia de *Merge Commit* para preservar histórico de releases).
-* O deploy de produção é disparado a partir da criação da tag ou do merge na `main`.
+2. **Merge para Produção:**
+* O PR é avaliado manualmente e mesclado na `main`.
+* O deploy de produção é disparado a partir do merge na `main`.
 
 
 

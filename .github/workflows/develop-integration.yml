@@ -31,11 +31,19 @@ jobs:
       - name: Run Integration Tests
         run: go test -v ./tests/unit/...
 
+      - name: Generate Release Tag
+        id: tagger
+        uses: mathieudutour/github-tag-action@v6.2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          default_bump: minor
+          # Opcional: tag_prefix: v
+
       - name: Create Pull Request to Main
         uses: peter-evans/create-pull-request@v6
         with:
           branch: release-candidate
           base: main
-          title: 'chore: release candidate from develop'
-          body: 'Auto-generated PR for next release.'
+          title: 'release: nova versão gerada na tag ${{ steps.tagger.outputs.new_tag }}'
+          body: 'Uma nova tag (${{ steps.tagger.outputs.new_tag }}) foi gerada com sucesso na develop. Revise este PR para aprovar o merge em produção (main).'
           labels: 'release'
