@@ -1,0 +1,51 @@
+name: Develop Integration
+
+on:
+  push:
+    branches:
+      - develop
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  integration:
+    name: Retest & Auto-PR to Main
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+          cache: true
+
+      - name: Verify Build
+        run: GOOS=linux GOARCH=arm64 go build -ldflags="-s -w" -o rover-server ./cmd/server
+
+      - name: Run Integration Tests
+        run: go test -v ./tests/unit/...
+
+      - name: Generate Release Tag
+        id: tagger
+        uses: mathieudutour/github-tag-action@v6.2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          default_bump: minor
+          # Opcional: tag_prefix: v
+
+      - name: Create Pull Request to Main
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_EXISTS=$(gh pr list --head develop --base main --state open --json number --jq 'length')
+          if [ "$PR_EXISTS" -eq "0" ]; then
+            gh pr create --base main --head develop --title "release: nova versão gerada na tag ${{ steps.tagger.outputs.new_tag }}" --body "Uma nova tag (${{ steps.tagger.outputs.new_tag }}) foi gerada com sucesso na develop. Revise este PR para aprovar o merge em produção (main)."
+          else
+            echo "Pull Request já existe. Nenhuma ação necessária."
+          fi

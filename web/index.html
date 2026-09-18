@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoverPi Control</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background: #222; color: #fff; }
+        #stream { max-width: 640px; width: 100%; border: 2px solid #555; margin-bottom: 20px; }
+        .controls { display: inline-block; text-align: left; background: #333; padding: 20px; border-radius: 8px; }
+        #status { font-weight: bold; margin-bottom: 10px; }
+        .connected { color: #4CAF50; }
+        .disconnected { color: #f44336; }
+        input[type="text"] { padding: 5px; font-size: 16px; }
+        button { padding: 6px 12px; font-size: 16px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>RoverPi Teleoperation</h1>
+    <div>
+        <img id="stream" src="/stream" alt="Camera Stream (Not Connected)">
+    </div>
+    
+    <div class="controls">
+        <div id="status" class="disconnected">Desconectado</div>
+        <div>
+            <label>PIN:</label>
+            <input type="text" id="pinInput" value="4321">
+            <button id="connectBtn">Conectar</button>
+        </div>
+        <p><strong>Controles:</strong></p>
+        <ul>
+            <li>W: Frente</li>
+            <li>S: Ré</li>
+            <li>A: Esquerda</li>
+            <li>D: Direita</li>
+            <li>Q: Diagonal Frente-Esquerda</li>
+            <li>E: Diagonal Frente-Direita</li>
+        </ul>
+        <p><em>Mantenha a tecla pressionada para mover.</em></p>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
