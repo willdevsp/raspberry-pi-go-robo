@@ -38,12 +38,14 @@ git checkout -b feature/nome-da-feature
 ```
 
 
-2. **Abertura de PR:** O desenvolvedor abre um Pull Request apontando para a branch `develop`.
-3. **Pipeline de Validação (`pr-feature-validation.yml`):**
-* **Disparo:** Eventos `pull_request` (abertura e sincronização) contra a branch `develop`.
+2. **Push e Pipeline de Validação (`pr-feature-validation.yml`):**
+* Ao concluir as edições, o desenvolvedor faz um `push` direto para sua branch `feature/*`.
+* **Disparo:** Evento `push` contra branches `feature/*`.
 * **Etapas executadas pelo runner:**
 * Validação de padronização de código (**Linter**).
 * Execução da suíte de **testes unitários** e cobertura de código.
+3. **Criação de PR Automática:**
+* Se a esteira passar com sucesso, uma action (`peter-evans/create-pull-request`) abre um PR apontando automaticamente para a branch `develop`.
 
 
 * **Auto-Merge:** Configurado via `gh pr merge --auto --squash` (ou action equivalente). Assim que os status checks forem aprovados e as regras de proteção forem atendidas, o GitHub Actions realiza o merge automático na `develop`.

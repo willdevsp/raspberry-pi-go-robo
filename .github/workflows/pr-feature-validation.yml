@@ -1,0 +1,43 @@
+name: PR Feature Validation
+
+on:
+  push:
+    branches:
+      - 'feature/*'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  validate-and-pr:
+    name: Lint, Test & Auto-PR
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+          cache: true
+
+      - name: Run Linter
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: latest
+
+      - name: Run Unit Tests
+        run: go test -v -cover ./tests/unit/...
+
+      - name: Create Pull Request to Develop
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: ${{ github.ref_name }}
+          base: develop
+          title: 'feat: automerge PR from ${{ github.ref_name }}'
+          body: 'Auto-generated PR from feature branch after successful validation.'
+          labels: 'feature, automated pr'

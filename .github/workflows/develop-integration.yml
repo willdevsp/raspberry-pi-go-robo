@@ -1,0 +1,41 @@
+name: Develop Integration
+
+on:
+  push:
+    branches:
+      - develop
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  integration:
+    name: Retest & Auto-PR to Main
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+          cache: true
+
+      - name: Verify Build
+        run: GOOS=linux GOARCH=arm64 go build -ldflags="-s -w" -o rover-server ./cmd/server
+
+      - name: Run Integration Tests
+        run: go test -v ./tests/unit/...
+
+      - name: Create Pull Request to Main
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: release-candidate
+          base: main
+          title: 'chore: release candidate from develop'
+          body: 'Auto-generated PR for next release.'
+          labels: 'release'
