@@ -65,7 +65,7 @@ func (h *WebSocketHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		h.mu.Unlock()
 		conn.Close()
 		// Safety: stop rover on disconnect
-		h.controller.WriteCommand('X')
+		_ = h.controller.WriteCommand('X')
 	}()
 
 	// 4.4 Watchdog
@@ -73,7 +73,7 @@ func (h *WebSocketHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	go func() {
 		<-watchdog.C
 		// Watchdog expired, stop rover
-		h.controller.WriteCommand('X')
+		_ = h.controller.WriteCommand('X')
 	}()
 
 	for {
@@ -98,7 +98,7 @@ func (h *WebSocketHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			// Relaying valid commands
 			switch cmd {
 			case 'W', 'A', 'S', 'D', 'Q', 'E', 'X':
-				h.controller.WriteCommand(cmd)
+				_ = h.controller.WriteCommand(cmd)
 			}
 		}
 	}

@@ -41,7 +41,7 @@ func main() {
 	if err := streamer.Start(); err != nil {
 		log.Printf("Warning: Failed to start camera: %v", err)
 	} else {
-		defer streamer.Stop()
+		defer func() { _ = streamer.Stop() }()
 	}
 
 	// 3. Setup WebSocket
@@ -65,8 +65,8 @@ func main() {
 				return
 			}
 			fmt.Fprintf(w, "--frame\r\nContent-Type: image/jpeg\r\nContent-Length: %d\r\n\r\n", len(frame))
-			w.Write(frame)
-			w.Write([]byte("\r\n"))
+			_, _ = w.Write(frame)
+			_, _ = w.Write([]byte("\r\n"))
 		}
 	})
 

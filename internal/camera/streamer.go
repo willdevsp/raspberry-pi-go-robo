@@ -47,7 +47,7 @@ func (s *PiStreamer) Start() error {
 func (s *PiStreamer) Stop() error {
 	if s.cmd != nil && s.cmd.Process != nil {
 		err := s.cmd.Process.Kill()
-		s.cmd.Wait() // cleanup
+		_ = s.cmd.Wait() // cleanup
 		return err
 	}
 	return nil
